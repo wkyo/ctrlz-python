@@ -107,7 +107,7 @@ def max_pool_1d(
     ksize : int, optional
         Kernel size, by default 3.
     stride : int, optional
-        Strde steps, by default 1.
+        Stride steps, by default 1.
     padding : int, optional
         Padding with N elements on both sides, by default 0.
     value : int, optional
@@ -116,7 +116,7 @@ def max_pool_1d(
     Returns
     -------
     numpy.ndarray
-        An 1-D array
+        An 1-D array.
 
     Examples
     --------
@@ -150,4 +150,55 @@ def max_pool_1d(
 
         output[idx_out] = v
 
+    return output
+
+
+def conv_1d(
+    array: np.ndarray,
+    kernel: np.ndarray,
+    stride: int = 1,
+    padding: int = 0,
+    value: int = 0,
+):
+    """1-D convolution.
+
+    Parameters
+    ----------
+    array : numpy.ndarray
+        An 1-D array
+    kernel : np.ndarray
+        An 1-D array, convolution kernel.
+    stride : int, optional
+        Stride steps, by default 1.
+    padding : int, optional
+        Padding with N elements on both sides, by default 0.
+    value : int, optional
+        Default padding value, by default 0.
+
+    Returns
+    -------
+    numpy.ndarray
+        An 1-D array.
+
+    Examples
+    --------
+    >>> a = np.array([8, 0, 6, 2, 5, 1, 0, 3])
+    >>> k = [1, 0, 1]
+    >>> conv_1d(a, k, stride=1, padding=1)
+    array([ 0, 14,  2, 11,  3,  5,  4,  0])
+    """
+    ksize = len(kernel)
+    L_in = len(array)
+    L_out = (L_in + 2 * padding - ksize) // stride + 1
+
+    if padding:
+        array = np.pad(array, padding, constant_values=value)
+
+    output = np.zeros(L_out, dtype=array.dtype)
+    for idx_out in range(L_out):
+        idx_in_left = idx_out * stride
+        idx_in_right = idx_in_left + ksize
+        region = array[idx_in_left:idx_in_right]
+        v = np.matmul(region, kernel)
+        output[idx_out] = v
     return output
